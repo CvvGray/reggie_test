@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cvv.reggie.mapper.DishDtoMapper">
+
+    <select id="selectDishdotPage" resultType="DishDto">
+        select
+            dish.*,category.name category_name
+        from
+            dish
+        left join
+            category
+        on
+            dish.category_id = category.id
+       <where>
+        <if test="name !=null and name != ''">
+            dish.name like "%"#{name}"%" and
+        </if>
+           dish.is_deleted = 0
+        </where>
+
+    </select>
+
+
+    <select id="selectDishdtoById" resultType="DishDto">
+        select
+            dish.*,category.name category_name
+        from
+            dish
+        left join
+            category
+        on
+            dish.category_id = category.id
+        where
+            dish.id = #{id} and dish.is_deleted = 0
+    </select>
+
+</mapper>
