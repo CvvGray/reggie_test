@@ -1,6 +1,8 @@
 server:
   port: 8080
 spring:
+  profiles:
+    active: resources
   application:
     name: reggie_take_out
   datasource:

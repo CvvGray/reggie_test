@@ -34,7 +34,7 @@ public class LoginCheckFilter implements Filter {
 
         String requestUrl = request.getRequestURI();
 
-        String[] strings = new String[]{"/backend/**","/fonts/**","/employee/login","/employee/logout","/common/**"};
+        String[] strings = new String[]{"/backend/**","/front/**","/employee/login","/employee/logout","/common/**","/user/sendMsg","/user/login"};
 
         boolean check = check(strings, requestUrl);
 
@@ -43,7 +43,14 @@ public class LoginCheckFilter implements Filter {
             return;
         }
 
-        Long currentUserId = (Long) request.getSession().getAttribute("employee");
+        Long currentEmployeeId = (Long) request.getSession().getAttribute("employee");
+        if (currentEmployeeId != null){
+            ThreadLocalForCurrentUserId.setCurrentId(currentEmployeeId);
+            filterChain.doFilter(request,response);
+            return;
+        }
+
+        Long currentUserId = (Long) request.getSession().getAttribute("user");
         if (currentUserId != null){
             ThreadLocalForCurrentUserId.setCurrentId(currentUserId);
             filterChain.doFilter(request,response);
