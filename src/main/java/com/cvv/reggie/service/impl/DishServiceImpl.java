@@ -14,6 +14,7 @@ import com.cvv.reggie.mapper.DishMapper;
 import com.cvv.reggie.service.DishFlavorService;
 import com.cvv.reggie.service.DishService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -35,16 +36,13 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     private DishDtoMapper dishDtoMapper;
 
     @Override
+    @Transactional
     public void saveWithFlavor(DishDto dishDto) {
         this.save(dishDto);
 
         Long dishId = dishDto.getId();
 
         List<DishFlavor> flavors = dishDto.getFlavors();
-
-        flavors.forEach((flavor) ->{
-            System.out.println("-------------------" + flavor.getDishId());
-        });
 
         flavors = flavors.stream().map((item) -> {
             item.setDishId(dishId);

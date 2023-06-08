@@ -35,9 +35,6 @@ public class DishController {
     @Resource
     private DishService dishService;
 
-    @Resource
-    private DishDtoMapper dishDtoMapper;
-
 
     /**
      * 新增菜品
@@ -111,7 +108,7 @@ public class DishController {
     @GetMapping("/page")
     public R<Page> dishPage(Integer page,Integer pageSize,String name){
         Page<DishDto> pageInfo = new Page<>(page,pageSize);
-        Page<DishDto> dishDtoPage = dishDtoMapper.selectDishdotPage(pageInfo, name);
+        Page<DishDto> dishDtoPage = dishService.getDishdotPage(pageInfo, name);
         return R.success(dishDtoPage);
     }
 
@@ -127,6 +124,11 @@ public class DishController {
         return R.success(dishDto);
     }
 
+    /**
+     * 修改菜品
+     * @param dishDto
+     * @return
+     */
     @PutMapping
     public R<String> modifyDish(@RequestBody DishDto dishDto){
         dishService.updateDishdto(dishDto);
@@ -134,31 +136,50 @@ public class DishController {
     }
 
     /**
-     * 启售/停售
+     * 启售/停售,批量起售/停售
      * @param changedStatus
-     * @param id
+     * @param ids
      * @return
      */
     @PostMapping("/status/{changedStatus}")
-    public R<String> modifyDishStatus(@PathVariable Integer changedStatus,@RequestParam(name = "ids") Long id){
+    public R<String> modifyDishStatus(@PathVariable Integer changedStatus,@RequestParam(name = "ids") Long ...ids){
 
 //        Dish stopSellDish = dishService.getById(id);
 //        stopSellDish.setStatus(changedStatus);
 //        dishService.updateById(stopSellDish);
-        LambdaUpdateWrapper<Dish> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(Dish::getId,id)
+
+        for (Long id : ids) {
+            LambdaUpdateWrapper<Dish> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(Dish::getId,id)
                     .set(Dish::getStatus,changedStatus);
-        dishService.update(null,updateWrapper);
+            dishService.update(null,updateWrapper);
+        }
 
         return R.success("修改成功");
     }
 
 
+    /**
+     * 删除菜品/批量删除菜品
+     * @param ids
+     * @return
+     */
     @DeleteMapping
-    public R<String> deleteDish(@RequestParam(name = "ids") Long id){
-        dishService.removeWithFlavor(id);
+    public R<String> deleteDish(@RequestParam(name = "ids") Long ...ids){
+        for (Long id:ids) {
+            dishService.removeWithFlavor(id);
+        }
         return R.success("删除成功");
     }
 
+
+    @GetMapping("/list")
+    public R<List> viewList(@RequestParam(name = "categoryId") Long categoryId){
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Dish::getCategoryId,categoryId)
+                .orderByAsc(Dish::getCreateTime);
+        List<Dish> dishList = dishService.list(queryWrapper);
+        return R.success(dishList);
+    }
 
 }

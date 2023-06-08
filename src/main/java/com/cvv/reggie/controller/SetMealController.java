@@ -1,0 +1,104 @@
+package com.cvv.reggie.controller;
+
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cvv.reggie.common.R;
+import com.cvv.reggie.dto.SetmealDto;
+import com.cvv.reggie.entity.Dish;
+import com.cvv.reggie.entity.Setmeal;
+import com.cvv.reggie.service.SetmealService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+
+/**
+ * @author: cvv
+ * @since: 1.0
+ * @version: 1.0
+ * @description:
+ */
+
+@RestController
+@Slf4j
+@RequestMapping("/setmeal")
+public class SetMealController {
+
+    @Resource
+    private SetmealService setmealService;
+
+    @PostMapping
+    public R<String> addSetmeal(@RequestBody SetmealDto setmealDto){
+        setmealService.saveWithDish(setmealDto);
+        return R.success("添加成功");
+    }
+
+
+
+    /**
+     * 套餐分页查询
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
+    @GetMapping("/page")
+    public R<Page> setmealPage(Integer page,Integer pageSize,String name){
+        Page<Setmeal> pageInfo = new Page<>(page,pageSize);
+        setmealService.getAllSetmealWithCategoryName(pageInfo,name);
+
+        return R.success(pageInfo);
+    }
+
+
+    /**
+     * 获取菜品数据，并回显给前端
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<SetmealDto> viewSetmeal(@PathVariable Long id){
+        SetmealDto setmealDto = setmealService.getSetmealDtobyId(id);
+        return R.success(setmealDto);
+    }
+
+    /**
+     * 修改套餐信息
+     * @param setmealDto
+     * @return
+     */
+    @PutMapping
+    public R<String> modifySetmeal(@RequestBody SetmealDto setmealDto){
+        setmealService.updateSetmeal(setmealDto);
+        return R.success("修改成功");
+    }
+
+    /**
+     * 启售/停售，批量启售/停售
+     * @param changedStatus
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/{changedStatus}")
+    public R<String> modifyDishStatus(@PathVariable Integer changedStatus,@RequestParam(name = "ids") Long ...ids){
+        for (Long id : ids) {
+            LambdaUpdateWrapper<Setmeal> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(Setmeal::getId,id)
+                    .set(Setmeal::getStatus,changedStatus);
+            setmealService.update(null,updateWrapper);
+        }
+        return R.success("修改成功");
+    }
+
+
+    @DeleteMapping
+    public R<String> deleteSetmeal(@RequestParam(name = "ids") Long ...ids){
+        for (Long id : ids) {
+            setmealService.removeWithDishes(id);
+        }
+        return R.success("删除成功");
+    }
+
+
+
+}

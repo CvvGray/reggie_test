@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cvv.reggie.mapper.SetmealMapper">
+    <select id="selectSetmealDtoWithCategoryName" resultType="SetmealDto">
+        select
+            setmeal.*,category.name category_name
+        from
+            setmeal
+        left join
+            category
+        on
+            setmeal.category_id = category.id
+        <where>
+            <if test="name !=null and name != ''">
+                setmeal.name like "%"#{name}"%" and
+            </if>
+            setmeal.is_deleted = 0
+        </where>
+    </select>
+
+    <!-- 根据id查询setmeal表并从setmeal_dish表中查询相关菜品-->
+    <select id="selectSetmealDtobyId" resultType="setmealDto">
+        select
+            setmeal.*,category.name category_name
+        from
+            setmeal
+        left join
+            category
+        on
+            setmeal.category_id = category.id
+        where
+            setmeal.id = #{id} and setmeal.is_deleted = 0
+    </select>
+
+</mapper>
