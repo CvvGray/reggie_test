@@ -1,6 +1,8 @@
 package com.cvv.reggie.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cvv.reggie.common.R;
 import com.cvv.reggie.dto.SetmealDto;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author: cvv
@@ -99,6 +102,17 @@ public class SetMealController {
         return R.success("删除成功");
     }
 
+
+
+    @GetMapping("/list")
+    public R<List<Setmeal>> listSetmeal(Setmeal setmeal){
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Setmeal::getCategoryId,setmeal.getCategoryId())
+                    .eq(Setmeal::getStatus,setmeal.getStatus());
+        List<Setmeal> list = setmealService.list(queryWrapper);
+
+        return R.success(list);
+    }
 
 
 }

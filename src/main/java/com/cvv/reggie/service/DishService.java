@@ -18,4 +18,6 @@ public interface DishService extends IService<Dish> {
     void updateDishdto(DishDto dishDto);
 
     void removeWithFlavor(Long id);
+
+    List<DishDto> getDishdtoByCategoryId(Long categoryId);
 }

@@ -37,4 +37,14 @@
             dish.id = #{id} and dish.is_deleted = 0
     </select>
 
+
+    <resultMap id="selectDishDto" type="dishDto">
+        <collection property="flavors"
+                    select="com.cvv.reggie.mapper.DishFlavorMapper.selectAllByDishIdDishFlavorList"
+                    column="id" />
+    </resultMap>
+    <select id="selectDishdtoByCategoryId" resultMap="selectDishDto">
+        select * from dish where category_id = #{categoryId}
+    </select>
+
 </mapper>

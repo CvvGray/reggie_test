@@ -174,12 +174,12 @@ public class DishController {
 
 
     @GetMapping("/list")
-    public R<List> viewList(@RequestParam(name = "categoryId") Long categoryId){
-        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Dish::getCategoryId,categoryId)
-                .orderByAsc(Dish::getCreateTime);
-        List<Dish> dishList = dishService.list(queryWrapper);
-        return R.success(dishList);
+    public R<List<DishDto>> viewList(@RequestParam(name = "categoryId") Long categoryId){
+        List<DishDto> dishDtoList = dishService.getDishdtoByCategoryId(categoryId);
+        dishDtoList.forEach((dishDto) ->{
+            log.info(dishDto.toString());
+        });
+        return R.success(dishDtoList);
     }
 
 }

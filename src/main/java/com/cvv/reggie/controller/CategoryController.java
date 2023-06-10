@@ -3,6 +3,7 @@ package com.cvv.reggie.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cvv.reggie.common.R;
+import com.cvv.reggie.dto.DishDto;
 import com.cvv.reggie.entity.Category;
 import com.cvv.reggie.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
@@ -78,23 +79,29 @@ public class CategoryController {
         return R.success("修改成功");
     }
 
+
     /**
-     * 菜品类型
+     * 根据条件查询分类数据
      * @param category
      * @return
      */
     @GetMapping("/list")
-    public R<List> listR(Category category){
+    public R<List<Category>> list(Category category){
+
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Category::getType,category.getType())
+        List<Category> listCategory = null;
+        if (category.getType() == null){
+            queryWrapper.orderByAsc(Category::getSort)
+                    .orderByDesc(Category::getUpdateTime);
+            listCategory = categoryService.list(queryWrapper);
+        }else {
+            queryWrapper.eq(Category::getType,category.getType())
                     .orderByAsc(Category::getSort)
-                    .orderByAsc(Category::getUpdateTime);
+                    .orderByDesc(Category::getUpdateTime);
+            listCategory = categoryService.list(queryWrapper);
+        }
 
-        List<Category> list = categoryService.list(queryWrapper);
-        return R.success(list);
+        return R.success(listCategory);
     }
-
-
-
 
 }

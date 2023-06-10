@@ -91,4 +91,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         queryWrapper.eq(DishFlavor::getDishId,id);
         dishFlavorService.remove(queryWrapper);
     }
+
+    @Override
+    public List<DishDto> getDishdtoByCategoryId(Long categoryId) {
+        return dishDtoMapper.selectDishdtoByCategoryId(categoryId);
+    }
 }

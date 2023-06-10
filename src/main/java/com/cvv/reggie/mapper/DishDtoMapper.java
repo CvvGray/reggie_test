@@ -6,10 +6,14 @@ import com.cvv.reggie.dto.DishDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface DishDtoMapper{
     Page<DishDto> selectDishdotPage(Page<DishDto> page, @Param("name") String name);
 
     DishDto selectDishdtoById(Long id);
+
+    List<DishDto> selectDishdtoByCategoryId(Long categoryId);
 
 }
