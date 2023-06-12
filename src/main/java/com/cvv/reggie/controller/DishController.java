@@ -1,28 +1,20 @@
 package com.cvv.reggie.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cvv.reggie.common.R;
 import com.cvv.reggie.dto.DishDto;
-import com.cvv.reggie.entity.Category;
 import com.cvv.reggie.entity.Dish;
-import com.cvv.reggie.mapper.DishDtoMapper;
-import com.cvv.reggie.service.CategoryService;
-import com.cvv.reggie.service.DishFlavorService;
 import com.cvv.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * @author: cvv
@@ -48,6 +40,7 @@ public class DishController {
      * @return
      */
     @PostMapping
+    @CacheEvict(value = "dishCache",key = "#dishDto.categoryId")
     public R<String> save(@RequestBody DishDto dishDto){
         dishService.saveWithFlavor(dishDto);
 
@@ -56,8 +49,8 @@ public class DishController {
 //        redisTemplate.delete(keys);
         
         //第二种实现方式,精确清理
-        String key = "dish_" + dishDto.getCategoryId();
-        redisTemplate.delete(key);
+//        String key = "dish_" + dishDto.getCategoryId();
+//        redisTemplate.delete(key);
 
         return R.success("新增菜品成功");
     }
@@ -145,6 +138,7 @@ public class DishController {
      * @return
      */
     @PutMapping
+    @CacheEvict(value = "dishCache",key = "#dishDto.categoryId")
     public R<String> modifyDish(@RequestBody DishDto dishDto){
         dishService.updateDishdto(dishDto);
 
@@ -153,8 +147,8 @@ public class DishController {
 //        redisTemplate.delete(keys);
 
         //第二种实现方式,精确清理
-        String key = "dish_" + dishDto.getCategoryId();
-        redisTemplate.delete(key);
+//        String key = "dish_" + dishDto.getCategoryId();
+//        redisTemplate.delete(key);
 
         return R.success("修改成功");
     }
@@ -191,6 +185,7 @@ public class DishController {
      * @return
      */
     @DeleteMapping
+    @CacheEvict(value = "dishCache",allEntries = true)
     public R<String> deleteDish(@RequestParam(name = "ids") Long ...ids){
 
         for (Long id:ids) {
@@ -201,22 +196,9 @@ public class DishController {
 
 
     @GetMapping("/list")
+    @Cacheable(value = "dishCache", key="#categoryId",unless="#result==null")
     public R<List<DishDto>> viewList(@RequestParam(name = "categoryId") Long categoryId){
-        List<DishDto> dishDtoList = null;
-        String key = "dish_" + categoryId;
-
-        //先从redis缓存中查找，
-        dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
-
-        //如果找到，直接返回数据
-        if (dishDtoList != null){
-            return R.success(dishDtoList);
-        }
-
-        //如果没有找到，就从数据库中查找，并将此数据保存到redis中一份
-        dishDtoList = dishService.getDishdtoByCategoryId(categoryId);
-        redisTemplate.opsForValue().set(key,dishDtoList,2, TimeUnit.HOURS);
-
+        List<DishDto> dishDtoList = dishService.getDishdtoByCategoryId(categoryId);
         return R.success(dishDtoList);
     }
 
