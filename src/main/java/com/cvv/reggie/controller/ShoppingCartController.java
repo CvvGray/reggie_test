@@ -3,12 +3,14 @@ package com.cvv.reggie.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cvv.reggie.common.R;
 import com.cvv.reggie.entity.ShoppingCart;
+import com.cvv.reggie.exception.CustomException;
 import com.cvv.reggie.service.ShoppingCartService;
 import com.cvv.reggie.utils.ThreadLocalForCurrentUserId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,7 +22,7 @@ import java.util.List;
 @RequestMapping("/shoppingCart")
 public class ShoppingCartController {
 
-    @Autowired
+    @Resource
     private ShoppingCartService shoppingCartService;
 
     /**
@@ -67,6 +69,49 @@ public class ShoppingCartController {
         return R.success(cartServiceOne);
     }
 
+    @PostMapping("/sub")
+    public R<String> sub(@RequestBody ShoppingCart shoppingCart){
+        //设置用户id，指定当前是哪个用户的购物车数据
+        Long currentId = ThreadLocalForCurrentUserId.getCurrentId();
+        shoppingCart.setUserId(currentId);
+
+        Long dishId = shoppingCart.getDishId();
+        LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ShoppingCart::getUserId,currentId);
+
+        if(dishId != null){
+            //从购物车中减去的是菜品
+            queryWrapper.eq(ShoppingCart::getDishId,dishId);
+
+        }else{
+            //添加到购物车的是套餐
+            queryWrapper.eq(ShoppingCart::getSetmealId,shoppingCart.getSetmealId());
+        }
+
+        //查询当前菜品或者套餐是否在购物车中
+        ShoppingCart cartServiceOne = shoppingCartService.getOne(queryWrapper);
+
+        //如果不存在则抛出异常
+        if(cartServiceOne == null){
+            throw new CustomException("数据异常");
+        }
+
+        Integer number = cartServiceOne.getNumber();
+        //如果已经存在，并且数量大于1，就在原来数量基础上减一
+        if (number > 1){
+            cartServiceOne.setNumber(number - 1);
+            shoppingCartService.updateById(cartServiceOne);
+        }else if (number == 1){
+            shoppingCartService.removeById(cartServiceOne);
+        }else {
+            throw new CustomException("数据异常");
+        }
+
+        return R.success("成功");
+    }
+
+
+
     /**
      * 查看购物车
      * @return
@@ -99,4 +144,5 @@ public class ShoppingCartController {
 
         return R.success("清空购物车成功");
     }
+
 }

@@ -39,6 +39,7 @@
 
 
     <resultMap id="selectDishDto" type="dishDto">
+        <id property="id" column="id" />
         <collection property="flavors"
                     select="com.cvv.reggie.mapper.DishFlavorMapper.selectAllByDishIdDishFlavorList"
                     column="id" />

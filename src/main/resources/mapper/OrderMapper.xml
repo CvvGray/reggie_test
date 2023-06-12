@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cvv.reggie.mapper.OrderMapper">
+    <resultMap id="getOrderDto" type="ordersDto">
+        <id property="id" column="id" />
+        <collection property="orderDetails"
+                    select="com.cvv.reggie.mapper.OrderDetailMapper.selectOrderDetailByOrderId"
+                    column="id" />
+    </resultMap>
+
+
+    <select id="selectOrdersDtoPageByUserId" resultMap="getOrderDto">
+        select * from orders where user_id = #{userId}
+    </select>
+</mapper>

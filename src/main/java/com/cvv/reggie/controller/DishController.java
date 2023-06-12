@@ -176,10 +176,9 @@ public class DishController {
     @GetMapping("/list")
     public R<List<DishDto>> viewList(@RequestParam(name = "categoryId") Long categoryId){
         List<DishDto> dishDtoList = dishService.getDishdtoByCategoryId(categoryId);
-        dishDtoList.forEach((dishDto) ->{
-            log.info(dishDto.toString());
-        });
         return R.success(dishDtoList);
     }
+
+
 
 }

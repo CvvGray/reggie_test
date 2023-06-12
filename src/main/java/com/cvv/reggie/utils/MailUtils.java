@@ -18,7 +18,7 @@ import java.util.Properties;
  */
 public final class MailUtils {
     private static final String USER = "1831147664@qq.com"; // 发件人称号，同邮箱地址※
-    private static final String PASSWORD = "nmyqahgfiqywccce"; // 授权码，开启SMTP时显示※
+    private static final String PASSWORD = "gcrwkabgmfqrcfgb"; // 授权码，开启SMTP时显示※
 
     /**
      *

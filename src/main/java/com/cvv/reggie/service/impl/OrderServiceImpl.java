@@ -2,7 +2,9 @@ package com.cvv.reggie.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cvv.reggie.dto.OrdersDto;
 import com.cvv.reggie.entity.*;
 import com.cvv.reggie.exception.CustomException;
 import com.cvv.reggie.mapper.OrderMapper;
@@ -34,6 +36,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
 
     @Resource
     private OrderDetailService orderDetailService;
+
+    @Resource
+    private OrderMapper orderMapper;
 
     /**
      * 用户下单
@@ -104,5 +109,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
 
         //清空购物车数据
         shoppingCartService.remove(wrapper);
+    }
+
+    @Override
+    public Page<OrdersDto> getOrdersDtoPageByUserId(Page<OrdersDto> pageInfo, Long userId) {
+        return orderMapper.selectOrdersDtoPageByUserId(pageInfo,userId);
     }
 }

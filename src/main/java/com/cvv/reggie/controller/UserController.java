@@ -45,6 +45,7 @@ public class UserController {
         if (StringUtils.isNotBlank(user.getEmail())){
             String checkCode = ValidateCodeUtils.generateValidateCode4String(6);
             String text = "您的登录验证码为：" + checkCode + "。有效时间为为5分钟。";
+            log.info(checkCode);
             String title = "瑞吉外卖验证";
             MailUtils.sendMail(user.getEmail(),text,"瑞吉外卖验证");
 
