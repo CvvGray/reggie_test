@@ -9,7 +9,6 @@ import com.cvv.reggie.entity.Orders;
 import com.cvv.reggie.service.OrderService;
 import com.cvv.reggie.utils.ThreadLocalForCurrentUserId;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
