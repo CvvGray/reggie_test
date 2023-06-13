@@ -24,6 +24,8 @@
     </select>
 
 
+
+
     <select id="selectDishdtoById" resultType="DishDto">
         select
             dish.*,category.name category_name
@@ -41,8 +43,9 @@
     <resultMap id="selectDishDto" type="dishDto">
         <id property="id" column="id" />
         <collection property="flavors"
+                    column="id"
                     select="com.cvv.reggie.mapper.DishFlavorMapper.selectAllByDishIdDishFlavorList"
-                    column="id" />
+                     />
     </resultMap>
     <select id="selectDishdtoByCategoryId" resultMap="selectDishDto">
         select * from dish where category_id = #{categoryId}
